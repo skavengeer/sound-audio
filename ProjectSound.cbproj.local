@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.947,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Project1PCH2.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.934,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Project1PCH2.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.819,D:\10 c++ audio\Project1PCH2.h=D:\10 c++ audio\ProjectSoundPCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.166,C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.dfm=D:\10 c++ audio\MainForm.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.166,C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.h=D:\10 c++ audio\MainForm.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.529,C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Project1PCH2.h=D:\10 c++ audio\Project1PCH2.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.166,C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.cpp=D:\10 c++ audio\MainForm.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.844,C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Project1.cbproj=D:\10 c++ audio\ProjectSound.cbproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.686,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.851,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.426,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.187,=C:\Users\Dino\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+  </Transactions>
+</BorlandProject>

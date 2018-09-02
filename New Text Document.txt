@@ -1,0 +1,295 @@
+#include <iostream>
+#include <Windows.h>
+#include <vector>
+using namespace std;
+
+#pragma comment(lib, "winmm.lib")
+
+short int waveIn[44100 * 3];
+
+void PlayRecord();
+
+void StartRecord()
+{
+const int NUMPTS = 44100 * 3; // 3 seconds
+int sampleRate = 44100; 
+// 'short int' is a 16-bit type; I request 16-bit samples below
+// for 8-bit capture, you'd use 'unsigned char' or 'BYTE' 8-bit types
+
+HWAVEIN hWaveIn;
+MMRESULT result;
+
+WAVEFORMATEX pFormat;
+pFormat.wFormatTag=WAVE_FORMAT_PCM; // simple, uncompressed format
+pFormat.nChannels=1; // 1=mono, 2=stereo
+pFormat.nSamplesPerSec=sampleRate; // 44100
+pFormat.nAvgBytesPerSec=sampleRate*2; // = nSamplesPerSec * n.Channels * wBitsPerSample/8
+pFormat.nBlockAlign=2; // = n.Channels * wBitsPerSample/8
+pFormat.wBitsPerSample=16; // 16 for high quality, 8 for telephone-grade
+pFormat.cbSize=0;
+
+// Specify recording parameters
+
+result = waveInOpen(&hWaveIn, WAVE_MAPPER,&pFormat,
+0L, 0L, WAVE_FORMAT_DIRECT);
+
+WAVEHDR WaveInHdr;
+// Set up and prepare header for input
+WaveInHdr.lpData = (LPSTR)waveIn;
+WaveInHdr.dwBufferLength = NUMPTS*2;
+WaveInHdr.dwBytesRecorded=0;
+WaveInHdr.dwUser = 0L;
+WaveInHdr.dwFlags = 0L;
+WaveInHdr.dwLoops = 0L;
+waveInPrepareHeader(hWaveIn, &WaveInHdr, sizeof(WAVEHDR));
+
+// Insert a wave input buffer
+result = waveInAddBuffer(hWaveIn, &WaveInHdr, sizeof(WAVEHDR));
+
+
+// Commence sampling input
+result = waveInStart(hWaveIn);
+
+
+cout << "recording..." << endl;
+
+Sleep(3 * 1000);
+// Wait until finished recording
+
+waveInClose(hWaveIn);
+
+PlayRecord();
+}
+
+void PlayRecord()
+{
+const int NUMPTS = 44100 * 3; // 3 seconds
+int sampleRate = 44100; 
+// 'short int' is a 16-bit type; I request 16-bit samples below
+// for 8-bit capture, you'd use 'unsigned char' or 'BYTE' 8-bit types
+
+HWAVEIN hWaveIn;
+
+WAVEFORMATEX pFormat;
+pFormat.wFormatTag=WAVE_FORMAT_PCM; // simple, uncompressed format
+pFormat.nChannels=1; // 1=mono, 2=stereo
+pFormat.nSamplesPerSec=sampleRate; // 44100
+pFormat.nAvgBytesPerSec=sampleRate*2; // = nSamplesPerSec * n.Channels * wBitsPerSample/8
+pFormat.nBlockAlign=2; // = n.Channels * wBitsPerSample/8
+pFormat.wBitsPerSample=16; // 16 for high quality, 8 for telephone-grade
+pFormat.cbSize=0;
+
+// Specify recording parameters
+
+waveInOpen(&hWaveIn, WAVE_MAPPER,&pFormat, 0L, 0L, WAVE_FORMAT_DIRECT);
+
+WAVEHDR WaveInHdr;
+// Set up and prepare header for input
+WaveInHdr.lpData = (LPSTR)waveIn;
+WaveInHdr.dwBufferLength = NUMPTS*2;
+WaveInHdr.dwBytesRecorded=0;
+WaveInHdr.dwUser = 0L;
+WaveInHdr.dwFlags = 0L;
+WaveInHdr.dwLoops = 0L;
+waveInPrepareHeader(hWaveIn, &WaveInHdr, sizeof(WAVEHDR));
+
+HWAVEOUT hWaveOut;
+cout << "playing..." << endl;
+waveOutOpen(&hWaveOut, WAVE_MAPPER, &pFormat, 0, 0, WAVE_FORMAT_DIRECT);
+waveOutWrite(hWaveOut, &WaveInHdr, sizeof(WaveInHdr)); // Playing the data
+Sleep(3 * 1000); //Sleep for as long as there was recorded
+
+waveInClose(hWaveIn);
+waveOutClose(hWaveOut);
+}
+
+int main()
+{
+StartRecord();
+return 0;
+}
+
+voice.o(.text+0x16e):voice.cpp: undefined reference to `waveInOpen@24'
+voice.o(.text+0x1b8):voice.cpp: undefined reference to `waveInPrepareHeader@12'
+voice.o(.text+0x1d5):voice.cpp: undefined reference to `waveInAddBuffer@12'
+voice.o(.text+0x1e6):voice.cpp: undefined reference to `waveInStart@4'
+voice.o(.text+0x22a):voice.cpp: undefined reference to `waveInClose@4'
+voice.o(.text+0x2a9):voice.cpp: undefined reference to `waveInOpen@24'
+voice.o(.text+0x2f0):voice.cpp: undefined reference to `waveInPrepareHeader@12'
+voice.o(.text+0x349):voice.cpp: undefined reference to `waveOutOpen@24'
+voice.o(.text+0x366):voice.cpp: undefined reference to `waveOutWrite@12'
+voice.o(.text+0x383):voice.cpp: undefined reference to `waveInClose@4'
+voice.o(.text+0x391):voice.cpp: undefined reference to `waveOutClose@4'
+
+Here is the full code. I'm using Dev-c++, and I linked it by creating new project deleted main.cpp,
+ then gone to project options>parameters and added to library WINMM.lib which is size of 42,9 KB 
+(43.982) bytes. Then created new file and pasted the code. If something's wrong in the code please 
+paste me correct variant because I'm new at this. Before I had similar problem but solved by added 
+libws2_32.a in the same way.
+--------------------------------------------
+
+
+
+***********************************************
+
+
+What is a Waveform Audio File?	TOC
+
+        A waveform audio file is the most common audio file format on Windows PC's. It is the simplest way to store sounds on your computer. They are in Resource Interchange File Format (RIFF), which stores headers and data in variable length "chunks", that always start with a four letter code like "WAVE", or "data". It stores the "data" as PCM (Pulse Code Modulation) data. Almost all of the time a waveform audio file does not compress its PCM data, this makes the files large, but easy and quick to read.
+Structure of a Waveform Audio File	TOC
+
+        The structure of a waveform audio file is quite elegant and logical. The file has three different "chunks" or sections to it. The first section is the "RIFF" section. The reason I call it the "RIFF" section is because all of the "chunks" start with a four byte key, or "id", that the file must have for it to be valid. The first sections key is the four byte's "RIFF". After the first key comes the file size. This is a long value that describes the size in bytes of the file. Next we have the second part of the "RIFF" "chunk", the form-type id. This is always a four byte value, and for waveform audio this value must be equal to "WAVE".
+
+That finishes the "RIFF" "chunk", which takes us to the "fmt " "chunk". This chunk stores the structure that contains the format information for the PCM data. So, the next four bytes after "WAVE" must be the four bytes "fmt ". Note that I am quoting the space after fmt. This space is important and must be there. After the "id" "fmt " comes a long value that represents the size of the wave format structure, followed by data block that contains the wave format structure information. The wave format structure info ends the "fmt " "chunk" and brings us to our last "chunk" the "data" "chunk".
+
+The "data" "chunk" of course starts with the four bytes "data", and is followed by a long that describes the length of the data. After that all that is left is the actual PCM data.
+
+This table show the structure of the Waveform Audio file:
+Waveform Audio File Structure
+Type	Size	Value
+First "Chunk" ID	4 bytes (char [4])	"RIFF"
+File Size	4 bytes (long)	Size of the file in bytes
+Form Type ID	4 bytes (char [4])	"WAVE"
+Second "Chunk" ID	4 bytes (char [4])	"fmt "
+Wave Format Size	4 bytes (long)	Size in bytes of the Wave Format Info
+Wave Format Info	Wave Format Size	Information on the format of the PCM data.
+Third "Chunk" ID	4 bytes (char [4])	"data"
+Data Size	4 bytes (long)	Size in bytes of the PCM data
+Data	Data Size	The actual PCM data
+The WaveFormat Structure	TOC
+
+        The WaveFormat Structure, is a struct that contains the format of the PCM data that is stored by a Waveform Audio File. Windows gives you this structure in the mmreg.h header file. The structure looks as follows:
+
+typedef struct {  
+    WORD  wFormatTag; 
+    WORD  nChannels; 
+    DWORD nSamplesPerSec; 
+    DWORD nAvgBytesPerSec; 
+    WORD  nBlockAlign; 
+    WORD  wBitsPerSample; 
+    WORD  cbSize; 
+} WAVEFORMATEX; 
+ 
+
+Members:
+
+	wFormatTag
+
+		Waveform-audio format type. Format tags are registered with Microsoft Corporation for many compression
+		algorithms. A complete list of format tags can be found in the MMREG.H header file.
+
+	nChannels
+
+		Number of channels in the waveform-audio data. Monaural data uses one channel and stereo data uses two
+		channels.
+
+	nSamplesPerSec
+
+		Sample rate, in samples per second (hertz), that each channel should be played or recorded. If wFormatTag is
+		WAVE_FORMAT_PCM, then common values for nSamplesPerSec are 8.0 kHz, 11.025 kHz, 22.05 kHz, and 44.1 kHz. For
+		non-PCM formats, this member must be computed according to the manufacturer's specification of the format
+		tag.
+
+	nAvgBytesPerSec
+
+		Required average data-transfer rate, in bytes per second, for the format tag. If wFormatTag is
+		WAVE_FORMAT_PCM, nAvgBytesPerSec should be equal to the product of nSamplesPerSec and nBlockAlign. For
+		non-PCM formats, this member must be computed according to the manufacturer's specification of the format
+		tag.
+		Playback and record software can estimate buffer sizes by using the nAvgBytesPerSec member.
+
+	nBlockAlign
+
+		Block alignment, in bytes. The block alignment is the minimum atomic unit of data for the wFormatTag format
+		type. If wFormatTag is WAVE_FORMAT_PCM, nBlockAlign should be equal to the product of nChannels and
+		wBitsPerSample divided by 8 (bits per byte). For non-PCM formats, this member must be computed according to
+		the manufacturer's specification of the format tag.
+		Playback and record software must process a multiple of nBlockAlign bytes of data at a time. Data written
+		and read from a device must always start at the beginning of a block. For example, it is illegal to start
+		playback of PCM data in the middle of a sample (that is, on a non-block-aligned boundary).
+
+	wBitsPerSample
+
+		Bits per sample for the wFormatTag format type. If wFormatTag is WAVE_FORMAT_PCM, then wBitsPerSample should
+		be equal to 8 or 16. For non-PCM formats, this member must be set according to the manufacturer's
+		specification of the format tag. Note that some compression schemes cannot define a value for
+		wBitsPerSample, so this member can be zero.
+
+	cbSize
+
+		Size, in bytes, of extra format information appended to the end of the WAVEFORMATEX structure. This
+		information can be used by non-PCM formats to store extra attributes for the wFormatTag. If no extra
+		information is required by the wFormatTag, this member must be set to zero. Note that for WAVE_FORMAT_PCM
+		formats (and only WAVE_FORMAT_PCM formats), this member is ignored.
+Reading the Waveform Audio File	TOC
+
+        Now that we know how the file is structured, and know all about the WaveFormat structure, all we have to do is read the file in. The following code does just that.
+
+#include <mmreg.h>
+#include<string>
+#include<fstream>
+
+/*--------------------------------------------------------------------------------**
+** This function takes in a filename, a pointer to a WAVEFORMATEX structure that  **
+** will be set, and a char* databuf, which will be allocated and filled with the  **
+** PCM data in the file filename.                                                 **
+**                                                                                **
+** On error it will throw a string with a proper error announcement               **
+**--------------------------------------------------------------------------------*/
+
+void OpenWaveFile (const std::string &filename, WAVEFORMATEX *pwfx, char* databuf){
+
+    std::ifstream file;
+    char csID[4];
+    long fsize;
+    long wfxsize;
+    long datasize;
+
+    file.open (filename.c_str (), std::ios_base::binary);
+    if (file == NULL){
+        std::string s ("Unable to open file ");
+        s += filename;
+        throw s;
+    }
+
+    file.read (csID, 4);
+    if (std::string (csID) != "RIFF"){
+        std::string s (" does not have a valid RIFF ID.");
+        s = filename + s;
+        throw s;
+    }
+
+    file.read ((char*)&fsize, 4);
+    file.read (csID, 4);
+    if (std::string (csID) != "WAVE"){
+        std::string s (" is not a valid WAVE form-type.");
+        s = filename + s;
+        throw s;
+    }
+
+    file.read (csID, 4);
+    if (std::string (csID) != "fmt "){
+        std::string s (" does not have a valid wave-form chunk ID.");
+        s = filename + s;
+        throw s;
+    }
+
+    file.read ((char*)&wfxsize, 4);
+    file.read ((char*)pwfx, wfxsize);
+    if (wfm ().wFormatTag != WAVE_FORMAT_PCM){
+        std::string s (" is not of type PCM wave format.");
+        s = filename + s;
+        throw s;
+    }
+
+    file.read (csID, 4);
+    if (std::string (csID) != "data"){
+        std::string s (" does not have a valid data chunk ID.");
+        s = filename + s;
+        throw s;
+    }
+
+    file.read ((char*)&datasize, 4);
+    databuf = new char [datasize];
+    file.read (databuf, datasize);
+}
